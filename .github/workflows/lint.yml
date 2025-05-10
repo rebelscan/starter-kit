@@ -1,0 +1,42 @@
+name: Format
+
+on:
+    push:
+        branches:
+            - develop
+            - main
+    pull_request:
+        branches:
+            - develop
+            - main
+
+jobs:
+    format:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  ref: ${{ github.head_ref }}
+
+            - name: Setup
+              uses: ./.github/actions/setup
+              with:
+                  php-version: '8.3'
+                  php-extensions: json, dom, curl, libxml, mbstring
+
+            - name: Install Pint
+              run: composer global require laravel/pint
+
+            - name: Run Pint
+              run: pint
+
+            - name: Format Frontend
+              run: npm run format
+
+            - name: Lint Frontend
+              run: npm run lint
+
+            - name: Commit linted files
+              uses: stefanzweifel/git-auto-commit-action@v5
+              with:
+                  commit_message: 'Fixes coding style'

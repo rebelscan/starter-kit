@@ -1,0 +1,139 @@
+x-app-env: &app-env
+    VITE_INERTIA_SSR_PORT: ${SSR_PORT}
+    DB_CONNECTION: mysql
+    DB_HOST: mysql
+    DB_PORT: 3306
+    DB_DATABASE: laravel
+    DB_USERNAME: laravel
+    DB_PASSWORD: laravel
+    REDIS_HOST: redis
+    SESSION_DRIVER: redis
+    CACHE_STORE: redis
+    QUEUE_CONNECTION: redis
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: ./.docker/app.Dockerfile
+            args:
+                TOKEN: ${TOKEN}
+                MODULES: ${MODULES}
+        volumes:
+            - ./storage:/var/www/html/storage
+        ports:
+            - ${APP_PORT}:8080
+        environment:
+            AUTORUN_ENABLED: true
+            <<: *app-env
+        depends_on:
+            - mysql
+            - redis
+        restart: always
+
+    ssr:
+        build:
+            context: .
+            dockerfile: ./.docker/app.Dockerfile
+            args:
+                TOKEN: ${TOKEN}
+                MODULES: ${MODULES}
+        command: ['php', '/var/www/html/artisan', 'inertia:start-ssr']
+        stop_signal: SIGTERM # Set this for graceful shutdown if you're using fpm-apache or fpm-nginx
+        environment:
+            AUTORUN_ENABLED: true
+            <<: *app-env
+        depends_on:
+            - app
+            - mysql
+            - redis
+        restart: unless-stopped
+
+    queue:
+        build:
+            context: .
+            dockerfile: ./.docker/app.Dockerfile
+            args:
+                TOKEN: ${TOKEN}
+                MODULES: ${MODULES}
+        command: ['php', '/var/www/html/artisan', 'queue:work', '--tries=3']
+        stop_signal: SIGTERM # Set this for graceful shutdown if you're using fpm-apache or fpm-nginx
+        environment:
+            AUTORUN_ENABLED: true
+            <<: *app-env
+        healthcheck:
+            # This is our native healthcheck script for the queue
+            test: ['CMD', 'healthcheck-queue']
+            start_period: 10s
+        depends_on:
+            - app
+            - mysql
+            - redis
+        restart: unless-stopped
+
+    scheduler:
+        build:
+            context: .
+            dockerfile: ./.docker/app.Dockerfile
+            args:
+                TOKEN: ${TOKEN}
+                MODULES: ${MODULES}
+        command: ['php', '/var/www/html/artisan', 'schedule:work']
+        stop_signal: SIGTERM # Set this for graceful shutdown if you're using fpm-apache or fpm-nginx
+        environment:
+            AUTORUN_ENABLED: true
+            <<: *app-env
+        healthcheck:
+            # This is our native healthcheck script for the scheduler
+            test: ['CMD', 'healthcheck-schedule']
+            start_period: 10s
+        depends_on:
+            - app
+            - mysql
+            - redis
+        restart: unless-stopped
+
+    horizon:
+        build:
+            context: .
+            dockerfile: ./.docker/app.Dockerfile
+            args:
+                TOKEN: ${TOKEN}
+                MODULES: ${MODULES}
+        command: ['php', '/var/www/html/artisan', 'horizon']
+        stop_signal: SIGTERM # Set this for graceful shutdown if you're using fpm-apache or fpm-nginx
+        environment:
+            AUTORUN_ENABLED: true
+            <<: *app-env
+        healthcheck:
+            # This is our native healthcheck script for Horizon
+            test: ['CMD', 'healthcheck-horizon']
+            start_period: 10s
+        depends_on:
+            - app
+            - mysql
+            - redis
+        restart: unless-stopped
+
+    redis:
+        image: redis:6.2
+        volumes:
+            - redis_data:/data
+        restart: unless-stopped
+
+    mysql:
+        image: mysql:8.0
+        environment:
+            MYSQL_ROOT_PASSWORD: laravel
+            MYSQL_DATABASE: laravel
+            MYSQL_USER: laravel
+            MYSQL_PASSWORD: laravel
+        volumes:
+            - mysql_data:/var/lib/mysql
+        ports:
+            - ${MYSQL_PORT}:3306
+        restart: unless-stopped
+
+volumes:
+    mysql_data:
+    redis_data:

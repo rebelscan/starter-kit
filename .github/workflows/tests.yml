@@ -1,0 +1,96 @@
+name: Run tests
+
+on:
+    push:
+        branches:
+            - develop
+            - main
+    pull_request:
+        branches:
+            - develop
+            - main
+
+jobs:
+    run-tests:
+        runs-on: ubuntu-latest
+
+        services:
+            mysql:
+                image: mysql:8.0
+                env:
+                    MYSQL_DATABASE: rebelscan
+                    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+                ports:
+                    - 3306:3306
+                options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.head_ref }}
+
+            - name: Setup
+              uses: ./.github/actions/setup
+              with:
+                  php-version: '8.3'
+
+            - run: composer install
+            - run: cp .env.example .env
+            - run: php artisan key:generate
+            - run: mkdir Modules
+            - run: composer config --global github-oauth.github.com ${{ secrets.GH_TOKEN }}
+            - run: php artisan module:setup --production --all --skip-migrations --skip-dependencies
+            - run: composer update
+            - run: php artisan config:clear
+            - run: php artisan module:enable --all
+
+            - run: php
+            - name: Run tests
+              env:
+                  DB_CONNECTION: mysql
+                  DB_DATABASE: rebelscan
+                  DB_HOST: 127.0.0.1
+                  DB_PORT: 3306
+                  DB_USERNAME: root
+              run: vendor/bin/pest --compact
+
+            - name: Notify Slack on failure
+              if: failure()
+              env:
+                  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+              run: |
+                  curl -X POST -H 'Content-type: application/json' \
+                  --data '{
+                      "blocks": [
+                          {
+                              "type": "section",
+                              "text": {
+                                  "type": "mrkdwn",
+                                  "text": "*GitHub Action Failed!*\nCheck the details below."
+                              }
+                          },
+                          {
+                              "type": "divider"
+                          },
+                          {
+                              "type": "section",
+                              "fields": [
+                                  {
+                                      "type": "mrkdwn",
+                                      "text": "*Repository:*\n'"${GITHUB_REPOSITORY}"'"
+                                  },
+                                  {
+                                      "type": "mrkdwn",
+                                      "text": "*Branch:*\n'"${GITHUB_REF}"'"
+                                  }
+                              ]
+                          },
+                          {
+                              "type": "section",
+                              "text": {
+                                  "type": "mrkdwn",
+                                  "text": "For more details, visit <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|GitHub Actions>"
+                              }
+                          }
+                      ]
+                  }' $SLACK_WEBHOOK_URL
