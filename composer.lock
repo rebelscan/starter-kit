@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d529926291effe36007cbb13c10ad412",
+    "content-hash": "bcb21e1a2b3987e9a36120968b78014a",
     "packages": [
         {
             "name": "azjezz/psl",
@@ -4042,11 +4042,18 @@
         {
             "name": "rebelscan/core",
             "version": "dev-main",
-            "dist": {
-                "type": "path",
-                "url": "/Users/azatakmyradov/work/latest/packages/core-dev",
-                "reference": "784d76ae4c243c11ecdbfcbf3d7285a4a7640dc1"
+            "source": {
+                "type": "git",
+                "url": "git@github.com:rebelscan/core.git",
+                "reference": "dd027902699154d262938696c39304b5a733ea76"
             },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rebelscan/core/zipball/dd027902699154d262938696c39304b5a733ea76",
+                "reference": "dd027902699154d262938696c39304b5a733ea76",
+                "shasum": ""
+            },
+            "default-branch": true,
             "type": "library",
             "extra": {
                 "laravel": {
@@ -4068,9 +4075,11 @@
                     "email": "azakmyradov@rklesolutions.com"
                 }
             ],
-            "transport-options": {
-                "relative": false
-            }
+            "support": {
+                "source": "https://github.com/rebelscan/core/tree/v0.1.0",
+                "issues": "https://github.com/rebelscan/core/issues"
+            },
+            "time": "2025-05-10T05:47:55+00:00"
         },
         {
             "name": "revolt/event-loop",
