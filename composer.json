@@ -11,7 +11,8 @@
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
-        "laravel/tinker": "^2.10.1"
+        "laravel/tinker": "^2.10.1",
+        "rebelscan/core": "dev-main"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -65,13 +66,21 @@
             "dont-discover": []
         }
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "/Users/azatakmyradov/work/latest/packages/core-dev"
+        }
+    ],
     "config": {
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
         "allow-plugins": {
+            "joshbrw/laravel-module-installer": true,
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "wikimedia/composer-merge-plugin": true
         }
     },
     "minimum-stability": "stable",
