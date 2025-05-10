@@ -91,8 +91,8 @@
     },
     "repositories": [
         {
-            "type": "path",
-            "url": "/Users/azatakmyradov/work/latest/packages/core-dev"
+            "type": "vcs",
+            "url": "git@github.com:rebelscan/core.git"
         }
     ],
     "config": {
