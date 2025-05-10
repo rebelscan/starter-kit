@@ -39,6 +39,7 @@
         "@tanstack/svelte-table": "^9.0.0-alpha.10",
         "@tsconfig/svelte": "^5.0.4",
         "chart.js": "^4.4.9",
+        "date-fns": "^4.1.0",
         "neverthrow": "^8.2.0",
         "sortablejs": "^1.15.6",
         "svelte": "^5.28.2",
