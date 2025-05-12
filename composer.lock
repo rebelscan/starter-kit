@@ -4045,13 +4045,17 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:rebelscan/core.git",
-                "reference": "dd027902699154d262938696c39304b5a733ea76"
+                "reference": "19e0fb7a4839abb221f44025b7f244ee7051531c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rebelscan/core/zipball/dd027902699154d262938696c39304b5a733ea76",
-                "reference": "dd027902699154d262938696c39304b5a733ea76",
+                "url": "https://api.github.com/repos/rebelscan/core/zipball/19e0fb7a4839abb221f44025b7f244ee7051531c",
+                "reference": "19e0fb7a4839abb221f44025b7f244ee7051531c",
                 "shasum": ""
+            },
+            "require-dev": {
+                "laravel/pint": "^1.22",
+                "rector/rector": "^2.0"
             },
             "default-branch": true,
             "type": "library",
@@ -4069,6 +4073,25 @@
                     "RebelScan\\Database\\Seeders\\": "database/seeders/"
                 }
             },
+            "scripts": {
+                "lint": [
+                    "pint"
+                ],
+                "refactor": [
+                    "rector"
+                ],
+                "test:lint": [
+                    "pint --test"
+                ],
+                "test:refactor": [
+                    "rector --dry-run"
+                ],
+                "test": [
+                    "@test:lint",
+                    "@test:refactor",
+                    "@test:types"
+                ]
+            },
             "authors": [
                 {
                     "name": "Azat Akmyradov",
@@ -4079,7 +4102,7 @@
                 "source": "https://github.com/rebelscan/core/tree/v0.1.0",
                 "issues": "https://github.com/rebelscan/core/issues"
             },
-            "time": "2025-05-10T05:47:55+00:00"
+            "time": "2025-05-12T15:53:35+00:00"
         },
         {
             "name": "revolt/event-loop",
