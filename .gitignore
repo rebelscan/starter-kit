@@ -23,3 +23,4 @@ yarn-error.log
 /.zed
 .license/*.lic
 storage/debugbar
+generated.d.ts
